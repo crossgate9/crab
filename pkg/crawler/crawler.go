@@ -1,6 +1,7 @@
 package crawler
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"sync"
@@ -23,6 +24,7 @@ type Crawler struct {
 //Crawl crawls a list of HTTP requests with a set number of workers
 func (c *Crawler) Crawl(requests []*http.Request) {
 	requestNum := len(requests)
+	fmt.Printf("Number of requests: %d\n", requestNum)
 
 	queue := make(chan *http.Request, requestNum)
 	for _, req := range requests {
@@ -36,12 +38,16 @@ func (c *Crawler) Crawl(requests []*http.Request) {
 	if c.NumberOfWorkers > numberOfWorkers {
 		numberOfWorkers = c.NumberOfWorkers
 	}
+	fmt.Printf("Number of workers: %d\n", numberOfWorkers)
 
 	for i := 0; i < numberOfWorkers; i++ {
 		go func() {
 			for req := range queue {
 				c.crawlRequest(req)
 				wg.Done()
+
+				fmt.Printf("Sleep for five second.\n")
+				time.Sleep(time.Second * 5)
 			}
 		}()
 	}
