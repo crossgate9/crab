@@ -90,7 +90,7 @@ func registerStandardCrawlCommandFlagModifiers(modifier *crawler.RequestModifier
 	}
 }
 
-func crawlUrls(urls []string, modifier crawler.RequestModifier, flagOptions crawlerFlagOptions, outWriter io.Writer) error {
+func crawlUrls(urls []string, agent string, modifier crawler.RequestModifier, flagOptions crawlerFlagOptions, outWriter io.Writer) error {
 	requests, err := crawler.CreateRequestsFromUrls(urls, modifier)
 	if err != nil {
 		return err
@@ -111,7 +111,7 @@ func crawlUrls(urls []string, modifier crawler.RequestModifier, flagOptions craw
 		FilterStatusQuery: flagOptions.FilterStatusQuery,
 		OutWriter:         outWriter,
 	}
-	crawl.Crawl(requests)
+	crawl.Crawl(requests, agent)
 
 	return nil
 }

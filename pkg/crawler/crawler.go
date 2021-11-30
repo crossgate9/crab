@@ -22,7 +22,7 @@ type Crawler struct {
 }
 
 //Crawl crawls a list of HTTP requests with a set number of workers
-func (c *Crawler) Crawl(requests []*http.Request) {
+func (c *Crawler) Crawl(requests []*http.Request, agent string) {
 	requestNum := len(requests)
 	fmt.Printf("Number of requests: %d\n", requestNum)
 
@@ -39,11 +39,12 @@ func (c *Crawler) Crawl(requests []*http.Request) {
 		numberOfWorkers = c.NumberOfWorkers
 	}
 	fmt.Printf("Number of workers: %d\n", numberOfWorkers)
+	fmt.Printf("User Agent: %s\n", agent)
 
 	for i := 0; i < numberOfWorkers; i++ {
 		go func() {
 			for req := range queue {
-				c.crawlRequest(req)
+				c.crawlRequest(req, agent)
 				wg.Done()
 
 				fmt.Printf("Sleep for five second.\n")
@@ -56,8 +57,9 @@ func (c *Crawler) Crawl(requests []*http.Request) {
 	close(queue)
 }
 
-func (c *Crawler) crawlRequest(req *http.Request) {
+func (c *Crawler) crawlRequest(req *http.Request, agent string) {
 	requestStartTime := time.Now()
+	req.Header.Set("User-Agent", agent)
 	res, err := c.HttpClient.Do(req)
 	duration := time.Since(requestStartTime)
 
